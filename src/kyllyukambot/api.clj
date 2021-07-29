@@ -2,34 +2,9 @@
   (:require [clj-http.client :as html]
             [cheshire.core :as json]
             [clojure.data.xml :as xml]
-            [clojure.zip :as zip])
+            [clojure.zip :as zip]
+            [kyllyukambot.utils :as utils])
   (:import (clojure.data.xml.node Element)))
-
-(def endpoint "http://udmcorpus.udman.ru/api/public/dictionary/search")
-
-(defn lang-id
-  "Makes language keyword into ID."
-  [lang]
-  (case lang
-    :udm 1
-    :ru 2))
-
-(defn get-defs
-  "Retrieves definitions for the word as lazy sequence."
-  [word lang]
-  (let [query {:word word
-               :lang {:id (lang-id lang)}}
-        res (html/post endpoint
-                       {:form-params query
-                        :content-type :json})]
-    (->> (json/parse-string (:body res) true)
-         (map :body))))
-
-(defn- traverse [tree f]
-  (loop [loc (zip/xml-zip tree)]
-    (if (zip/end? loc)
-      (zip/node loc)
-      (recur (zip/next (f loc))))))
 
 (defn- transform [loc]
   (let [node (zip/node loc)]
@@ -64,6 +39,27 @@
   "Adjust markup to the standard."
   [s]
   (-> (xml/parse-str (str "<div>" s "</div>"))
-      (traverse transform)
-      (xml/emit-str)
+      zip/xml-zip
+      (utils/traverse transform)
+      xml/emit-str
       (#(subs % 43 (- (count %) 6)))))
+
+(def endpoint "http://udmcorpus.udman.ru/api/public/dictionary/search")
+
+(defn lang-id
+  "Makes language keyword into ID."
+  [lang]
+  (case lang
+    :udm 1
+    :ru 2))
+
+(defn get-defs
+  "Retrieves definitions for the word as lazy sequence."
+  [word lang]
+  (let [query {:word word
+               :lang {:id (lang-id lang)}}
+        res (html/post endpoint
+                       {:form-params query
+                        :content-type :json})]
+    (->> (json/parse-string (:body res) true)
+         (map (comp as-tghtml :body)))))

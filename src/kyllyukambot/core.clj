@@ -19,8 +19,7 @@
                      (render-file "word-not-specified.md" {:lang lang}))
         (let [data (api/get-defs word (keyword lang))]
           (if (seq data)
-            (->> (map api/as-tghtml data)
-                 (map (partial t/send-text token id {:parse_mode "HTML"}))
+            (->> (map (partial t/send-text token id {:parse_mode "HTML"}) data)
                  doall)
             (t/send-text token id {:parse_mode "Markdown"}
                          (render-file "not-found.md" {:lang lang}))))))))
