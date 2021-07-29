@@ -52,9 +52,10 @@
 
               "m1"
               (as-> loc loc'
-                (zip/remove loc')
+                ;; Remove afterwards to preserve nesting level
                 (zip/insert-right loc' "\n")
-                (zip/right loc')
+                (zip/remove loc')
+                (zip/next loc')
                 (reduce zip/insert-right loc' (reverse (:content node))))
 
               loc))))

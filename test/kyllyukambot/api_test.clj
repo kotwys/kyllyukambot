@@ -15,6 +15,9 @@
   (testing "strips empty elements"
     (is (= "hello world"
            (api/as-tghtml "hello <b></b>world"))))
+  (testing "preserves nesting"
+    (is (= "<b>bold</b>\nand then"
+           (api/as-tghtml "<span class=\"b\">bold</span><span class=\"m1\">and then</span>"))))
   (testing "accent mark"
     (is (= "ударе́ние"
            (api/as-tghtml "удар<span class=\"apos\">е</span>ние")))))
