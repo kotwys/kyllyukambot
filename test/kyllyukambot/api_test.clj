@@ -17,7 +17,9 @@
            (api/as-tghtml "hello <b></b>world"))))
   (testing "preserves nesting"
     (is (= "<b>bold</b>\nand then"
-           (api/as-tghtml "<span class=\"b\">bold</span><span class=\"m1\">and then</span>"))))
+           (api/as-tghtml "<span class=\"b\">bold</span><span class=\"m1\">and then</span>")))
+    (is (= "ю́ра"
+           (api/as-tghtml "<span class=\"apos\">ю</span>ра"))))
   (testing "accent mark"
     (is (= "ударе́ние"
            (api/as-tghtml "удар<span class=\"apos\">е</span>ние")))))

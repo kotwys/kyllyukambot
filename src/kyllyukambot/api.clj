@@ -19,15 +19,14 @@
               (zip/edit loc merge {:tag "i", :attrs {}})
 
               "apos"
-              (-> (zip/remove loc)
-                  (zip/insert-right (:content node))
-                  (zip/right)
+              (-> (zip/insert-right loc (:content node))
+                  (zip/remove)
+                  (zip/next)
                   (zip/insert-right (str (char 769)))
                   (zip/right))
 
               "m1"
               (as-> loc loc'
-                ;; Remove afterwards to preserve nesting level
                 (zip/insert-right loc' "\n")
                 (zip/remove loc')
                 (zip/next loc')
