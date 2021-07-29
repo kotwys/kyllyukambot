@@ -1,48 +1,60 @@
 (ns kyllyukambot.core
   (:require [kyllyukambot.api :as api]
+            [kyllyukambot.polling :refer [start]]
             [clojure.core.async :refer [<!!]]
+            [clojure.core.match :refer [match]]
             [clojure.string :as str]
-            [clojure.java.io :as io]
-            [morse.handlers :as h]
-            [morse.api :as t]
-            [morse.polling :as p]
-            [environ.core :refer [env]]
-            [selmer.parser :refer [render-file]])
+            [selmer.parser :refer [render-file]]
+            [telegrambot-lib.core :as tbot])
   (:gen-class))
 
-(def token (env :telegram-token))
+(def bot (tbot/create))
 
-(defn lookup-cmd [lang]
-  (fn [{{id :id} :chat, msg :text}]
-    (let [word (get (str/split msg #"\s+") 1)]
-      (if (nil? word)
-        (t/send-text token id
-                     (render-file "word-not-specified.md" {:lang lang}))
-        (let [data (api/get-defs word (keyword lang))]
-          (if (seq data)
-            (->> (map (partial t/send-text token id {:parse_mode "HTML"}) data)
-                 doall)
-            (t/send-text token id {:parse_mode "Markdown"}
-                         (render-file "not-found.md" {:lang lang}))))))))
+(defn lookup [word lang]
+  (if (nil? word)
+    {:text (render-file "word-not-specified.md" {:lang lang})}
+    (let [data (api/get-defs word (keyword lang))]
+      (if (seq data)
+        {:text (str/join "\n\n" data)
+         :parse_mode "HTML"}
+        {:text (render-file "not-found.md" {:lang lang})
+         :parse_mode "Markdown"}))))
 
-(h/defhandler bot-api
-  (h/command "start" {{id :id} :chat}
-             (t/send-text token id
-                          {:parse_mode "Markdown"}
-                          (render-file "start.md" {})))
+(defn handle [update]
+  (match [update]
+    [{:message {:text msg, :chat {:id id}}}]
+    (if-let [tokens (seq (str/split msg #"\s+"))]
+      (case (-> tokens first (str/split #"@") first)
+        "/start"
+        {:method "sendMessage"
+         :chat_id id
+         :text (render-file "start.md" {})
+         :parse_mode "Markdown"}
+        
+        "/help"
+        {:method "sendMessage"
+         :chat_id id
+         :text (render-file "help.md" {})
+         :parse_mode "Markdown"}
+        
+        "/udm"
+        (merge (lookup (second tokens) "udm")
+               {:method "sendMessage"
+                :chat_id id})
 
-  (h/command "help" {{id :id} :chat}
-             (t/send-text token id
-                          {:parse_mode "Markdown"}
-                          (render-file "help.md" {})))
+        "/ru"
+        (merge (lookup (second tokens) "ru")
+               {:method "sendMessage"
+                :chat_id id})))
 
-  (h/command-fn "udm" (lookup-cmd "udm"))
-  (h/command-fn "ru" (lookup-cmd "ru")))
+    :else nil))
 
 (defn -main [& args]
-  (when (str/blank? token)
-    (println "Please provide token in TELEGRAM_TOKEN")
+  (when (nil? (:bot-token bot))
+    (println "Please provide token in BOT_TOKEN")
     (System/exit 1))
 
   (println "Starting the bot...")
-  (<!! (p/start token bot-api)))
+  (<!! (start bot handle
+              {:timeout 1
+               :allowed_updates ["message"]})))
