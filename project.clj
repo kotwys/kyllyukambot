@@ -8,4 +8,6 @@
                  [environ "1.2.0"]
                  [selmer "1.12.44"]]
   :plugins [[lein-cljfmt "0.8.0"]]
-  :main kyllyukambot.core)
+  :main kyllyukambot.core
+  :uberjar-name "kyllyukambot.jar"
+  :profiles {:uberjar {:aot :all}})

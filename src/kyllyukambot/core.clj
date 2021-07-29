@@ -7,7 +7,8 @@
             [morse.api :as t]
             [morse.polling :as p]
             [environ.core :refer [env]]
-            [selmer.parser :refer [render-file]]))
+            [selmer.parser :refer [render-file]])
+  (:gen-class))
 
 (def token (env :telegram-token))
 
@@ -38,7 +39,7 @@
   (h/command-fn "udm" (lookup-cmd "udm"))
   (h/command-fn "ru" (lookup-cmd "ru")))
 
-(defn -main []
+(defn -main [& args]
   (when (str/blank? token)
     (println "Please provide token in TELEGRAM_TOKEN")
     (System/exit 1))

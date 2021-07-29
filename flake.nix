@@ -7,6 +7,7 @@
       in {
         devShell = pkgs.mkShell {
           buildInputs = builtins.attrValues {
+            inherit (pkgs) heroku;
             leiningen = pkgs.leiningen.override {
               jdk = pkgs.jdk8;
             };
