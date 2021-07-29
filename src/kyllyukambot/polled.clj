@@ -1,7 +1,7 @@
-(ns kyllyukambot.core
+(ns kyllyukambot.polled
   (:require [clojure.core.async :refer [<!!]]
             [kyllyukambot.handler :refer [bot handle]]
-            [kyllyukambot.polling :refer [start]])
+            [kyllyukambot.net.polling :refer [start]])
   (:gen-class))
 
 (defn -main [& args]

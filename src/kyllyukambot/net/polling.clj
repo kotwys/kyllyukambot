@@ -1,4 +1,4 @@
-(ns kyllyukambot.polling
+(ns kyllyukambot.net.polling
   (:require [clojure.core.async :as as :refer [<! >!]]
             [telegrambot-lib.core :as tbot]
             [telegrambot-lib.http :as thttp]))
