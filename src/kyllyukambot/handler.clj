@@ -27,13 +27,13 @@
          :chat_id id
          :text (render-file "start.md" {})
          :parse_mode "Markdown"}
-        
+
         "/help"
         {:method "sendMessage"
          :chat_id id
          :text (render-file "help.md" {})
          :parse_mode "Markdown"}
-        
+
         "/udm"
         (merge (lookup (second tokens) "udm")
                {:method "sendMessage"

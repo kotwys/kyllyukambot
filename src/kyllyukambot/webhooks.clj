@@ -8,10 +8,10 @@
 
 (defroutes app
   (POST (str "/" (:bot-token bot))
-       [& update]
-       {:status 200
-        :headers {"Content-Type" "application/json; charset=utf-8"}
-        :body (handle update)})
+    [& update]
+    {:status 200
+     :headers {"Content-Type" "application/json; charset=utf-8"}
+     :body (handle update)})
   (route/not-found "Not found"))
 
 (defn -main [& args]

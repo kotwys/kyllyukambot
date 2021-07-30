@@ -28,18 +28,18 @@
           timed-out
           (do (as/close! res)
               (as/close! stop))
-          
+
           stop
           (do (as/close! res)
               (as/close! timed-out))
 
           res
           ([response]
-            (as/close! timed-out)
-            (rethrow response)
-            (let [data (:result response)]
-              (doseq [update data] (>! updates update))
-              (recur (next-offset data offset)))))))
+           (as/close! timed-out)
+           (rethrow response)
+           (let [data (:result response)]
+             (doseq [update data] (>! updates update))
+             (recur (next-offset data offset)))))))
     updates))
 
 (defn start
