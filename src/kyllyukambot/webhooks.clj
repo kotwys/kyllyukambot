@@ -26,4 +26,4 @@
                          (:bot-token bot))
                     {:allowed_updates ["message"]})
   (println "Starting server...")
-  (run-server app {:port (env :port)}))
+  (run-server app {:port (-> :port env Integer/parseInt)}))
