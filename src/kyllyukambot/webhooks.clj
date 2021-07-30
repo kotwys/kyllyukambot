@@ -11,12 +11,10 @@
   (match [req]
     [{:uri uri, :request-method :post, :body body}]
     (with-open [reader (io/reader body)]
-      (let [update (-> (json/parse-stream reader true))]
-        (println update)
+      (let [update (json/parse-stream reader true)]
         {:status 200
         :headers {"Content-Type" "application/json; charset=utf-8"}
-        :body (-> update
-                  handle
+        :body (-> (handle update)
                   json/generate-string)}))
 
     :else

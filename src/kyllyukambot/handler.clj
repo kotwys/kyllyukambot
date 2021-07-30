@@ -42,6 +42,10 @@
         "/ru"
         (merge (lookup (second tokens) "ru")
                {:method "sendMessage"
-                :chat_id id})))
+                :chat_id id})
+        
+        (merge-with #(str/join "\n\n" [%1 %2])
+                    {:text (render-file "ru-default.md" {})}
+                    (lookup (first tokens) "ru"))))
 
     :else nil))
