@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -jar target/kyllyukambot.jar
+web: java $JVM_OPTS -cp target/kyllyukambot.jar clojure.main -m kyllyukambot.webhooks
