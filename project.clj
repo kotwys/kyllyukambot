@@ -1,5 +1,6 @@
 (defproject kyllyukambot "0.1.0-SNAPSHOT"
   :description "Udmurt dictionary bot for Telegram"
+  :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/core.async "1.3.618"]
                  [org.clojure/core.match "1.0.0"]
