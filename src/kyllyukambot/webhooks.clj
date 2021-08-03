@@ -5,8 +5,8 @@
             [cheshire.core :as json]
             [org.httpkit.server :refer :all]
             [environ.core :refer [env]]
-            [telegrambot-lib.core :as tbot]
-            [kyllyukambot.handler :refer [bot handle]]))
+            [kyllyukambot.handler :refer [handle]]
+            [kyllyukambot.net.telegram :as tg]))
 
 (defn app [uri req]
   (match [req]
@@ -23,17 +23,17 @@
      :body "Not found"}))
 
 (defn -main [& args]
-  (when (nil? (:bot-token bot))
+  (when (nil? (env :bot-token))
     (println "Please provide token in BOT_TOKEN")
     (System/exit 1))
 
   (println "Starting server...")
-  (run-server (partial app (str "/" (:bot-token bot)))
+  (run-server (partial app (str "/" (env :bot-token)))
               {:port (-> :port env Integer/parseInt)})
   (println "Setting webhook...")
-  (tbot/set-webhook bot
-                    (str "https://"
-                         (env :heroku-app-name)
-                         ".herokuapp.com/"
-                         (:bot-token bot))
-                    {:allowed_updates ["message"]}))
+  (tg/call (env :bot-token) "setWebhook"
+           {:url (str "https://"
+                      (env :heroku-app-name)
+                      ".herokuapp.com/"
+                      (env :bot-token))
+            :allowed_updates ["messages"]}))

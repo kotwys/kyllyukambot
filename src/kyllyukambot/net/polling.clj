@@ -1,7 +1,6 @@
 (ns kyllyukambot.net.polling
   (:require [clojure.core.async :as as :refer [<! >!]]
-            [telegrambot-lib.core :as tbot]
-            [telegrambot-lib.http :as thttp]))
+            [kyllyukambot.net.telegram :as tg]))
 
 (def timeout (* 60 1000))
 
@@ -18,12 +17,11 @@
 
 (defn poll
   "Poll Telegram API as [bot]."
-  [bot stop opts]
-  (let [bot (assoc bot :async true)
-        updates (as/chan)]
+  [token stop opts]
+  (let [updates (as/chan)]
     (as/go-loop [offset 0]
       (let [timed-out (as/timeout timeout)
-            res (tbot/get-updates bot (merge opts {:offset offset}))]
+            res (tg/call token "getUpdates" (merge opts {:offset offset}))]
         (as/alt!
           timed-out
           (do (as/close! res)
@@ -36,22 +34,23 @@
           res
           ([response]
            (as/close! timed-out)
-           (rethrow response)
-           (let [data (:result response)]
-             (doseq [update data] (>! updates update))
-             (recur (next-offset data offset)))))))
+           (if-let [e (:error response)]
+             (do (throw e)
+                 (as/close! stop))
+             (let [data (:result response)]
+               (doseq [update data] (>! updates update))
+               (recur (next-offset data offset))))))))
     updates))
 
 (defn start
   "Start polling."
-  [bot handle opts]
+  [token handle opts]
   (let [stop (as/chan)
-        updates (poll bot stop opts)]
+        updates (poll token stop opts)]
     (as/go-loop []
       (when-let [update (<! updates)]
         (when-let [{path :method :as opts} (<! (handle update))]
-          (thttp/request bot path
-                         (dissoc opts :method)))
+          (tg/call token path (dissoc opts :method)))
         (recur)))
     stop))
 

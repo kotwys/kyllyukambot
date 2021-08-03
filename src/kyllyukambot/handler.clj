@@ -3,11 +3,8 @@
             [clojure.core.match :refer [match]]
             [clojure.string :as str]
             [selmer.parser :refer [render-file]]
-            [telegrambot-lib.core :as tbot]
             [kyllyukambot.api :as api]
             [kyllyukambot.utils :as utils]))
-
-(def bot (tbot/create))
 
 (defn lookup [word lang]
   (if (nil? word)
