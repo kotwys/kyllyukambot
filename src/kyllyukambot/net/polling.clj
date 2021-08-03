@@ -49,7 +49,7 @@
         updates (poll bot stop opts)]
     (as/go-loop []
       (when-let [update (<! updates)]
-        (when-let [{path :method :as opts} (handle update)]
+        (when-let [{path :method :as opts} (<! (handle update))]
           (thttp/request bot path
                          (dissoc opts :method)))
         (recur)))

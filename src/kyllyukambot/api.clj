@@ -1,6 +1,7 @@
 (ns kyllyukambot.api
   (:require [clj-http.client :as html]
             [cheshire.core :as json]
+            [clojure.core.async :as as]
             [clojure.data.xml :as xml]
             [clojure.zip :as zip]
             [kyllyukambot.utils :as utils])
@@ -53,12 +54,17 @@
     :ru 2))
 
 (defn get-defs
-  "Retrieves definitions for the word as lazy sequence."
+  "Retrieves definitions for the word and returns a channel."
   [word lang]
   (let [query {:word word
                :lang {:id (lang-id lang)}}
-        res (html/post endpoint
-                       {:form-params query
-                        :content-type :json})]
-    (->> (json/parse-string (:body res) true)
-         (map (comp as-tghtml :body)))))
+        ch (as/chan 1
+                    (map #(->> (json/parse-string (:body %) true)
+                               (map (comp as-tghtml :body)))))]
+    (html/post endpoint
+                {:async? true
+                 :form-params query
+                 :content-type :json}
+                (partial as/put! ch)
+                #(throw %))
+    ch))

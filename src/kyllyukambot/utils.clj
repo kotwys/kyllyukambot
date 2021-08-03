@@ -1,5 +1,11 @@
 (ns kyllyukambot.utils
-  (:require [clojure.zip :as zip]))
+  (:require [clojure.core.async :as as]
+            [clojure.zip :as zip]))
+
+(defn instant
+  "Returns a channel with instant value."
+  [v]
+  (as/to-chan [v]))
 
 (defn traverse
   "Traverse tree through a zipper applying a function."

@@ -1,5 +1,6 @@
 (ns kyllyukambot.webhooks
-  (:require [clojure.core.match :refer [match]]
+  (:require [clojure.core.async :refer [<!!]]
+            [clojure.core.match :refer [match]]
             [clojure.java.io :as io]
             [cheshire.core :as json]
             [org.httpkit.server :refer :all]
@@ -14,7 +15,7 @@
       (let [update (json/parse-stream reader true)]
         {:status 200
         :headers {"Content-Type" "application/json; charset=utf-8"}
-        :body (-> (handle update)
+        :body (-> (<!! (handle update))
                   json/generate-string)}))
 
     :else
