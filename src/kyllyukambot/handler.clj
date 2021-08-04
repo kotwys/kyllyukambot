@@ -43,7 +43,7 @@
         (merge (lookup (second tokens) "ru")
                {:method "sendMessage"
                 :chat_id id})
-        
+
         (merge-with #(str/join "\n\n" [%1 %2])
                     {:method "sendMessage"
                      :chat_id id

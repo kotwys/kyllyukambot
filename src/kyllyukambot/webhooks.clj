@@ -13,9 +13,9 @@
     (with-open [reader (io/reader body)]
       (let [update (json/parse-stream reader true)]
         {:status 200
-        :headers {"Content-Type" "application/json; charset=utf-8"}
-        :body (-> (handle update)
-                  json/generate-string)}))
+         :headers {"Content-Type" "application/json; charset=utf-8"}
+         :body (-> (handle update)
+                   json/generate-string)}))
 
     :else
     {:status 404
