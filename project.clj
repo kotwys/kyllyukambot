@@ -1,5 +1,6 @@
-(defproject kyllyukambot "0.1.0-SNAPSHOT"
+(defproject kyllyukambot "0.1.0"
   :description "Udmurt dictionary bot for Telegram"
+  :url "https://github.com/kotwys/kyllyukambot"
   :license {:name "Eclipse Public License - v 2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :min-lein-version "2.0.0"
