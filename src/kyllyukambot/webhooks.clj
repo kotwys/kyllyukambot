@@ -32,7 +32,7 @@
   (println "Setting webhook...")
   (tbot/set-webhook bot
                     (str "https://"
-                         (env :heroku-app-name)
-                         ".herokuapp.com/"
+                         (env :bot-domain)
+                         "/"
                          (:bot-token bot))
                     {:allowed_updates ["message"]}))
